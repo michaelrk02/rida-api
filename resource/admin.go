@@ -31,5 +31,6 @@ type AdminResponseOnCreate struct {
 
 type AdminResponseOnLogin struct {
     ID string `json:"id"`
+    Role string `json:"role"`
     Token string `json:"token"`
 }

@@ -32,6 +32,8 @@ func InitRoutesV1(r chi.Router, app *service.Application) {
         r.Get("/peneliti", app.RouteV1.GetAllPeneliti)
         r.Get("/peneliti/{peneliti}", app.RouteV1.GetPeneliti)
         r.Put("/peneliti/{peneliti}", app.RouteV1.UpdatePeneliti)
-        r.Delete("/peneliti", app.RouteV1.DeletePeneliti)
+        r.Delete("/peneliti/{peneliti}", app.RouteV1.DeletePeneliti)
     })
+
+    r.Get("/fakultas", app.RouteV1.GetAllFakultas)
 }

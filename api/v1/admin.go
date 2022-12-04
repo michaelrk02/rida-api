@@ -55,8 +55,16 @@ func (routes *RouteCollection) LoginAdmin(w http.ResponseWriter, r *http.Request
         return
     }
 
+    role := ""
+    if admin.FakultasID.Valid {
+        role = "admin"
+    } else {
+        role = "superadmin"
+    }
+
     resp := resource.AdminResponseOnLogin{
         ID: admin.ID,
+        Role: role,
         Token: token,
     }
     w.Header().Set("Content-Type", "application/json")

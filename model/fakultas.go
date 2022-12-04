@@ -1,8 +1,7 @@
 package model
 
 import (
-    //"github.com/michaelrk02/rida-api/resource"
-    //"gorm.io/gorm"
+    "github.com/michaelrk02/rida-api/resource"
 )
 
 type Fakultas struct {
@@ -14,15 +13,9 @@ func (Fakultas) TableName() string {
     return "fakultas"
 }
 
-/*func (t Test) ToResponse() resource.TestResponse {
-    return resource.TestResponse{
-        ID: t.ID,
-        Nama: t.Nama,
+func (f Fakultas) ToResponse() resource.FakultasResponse {
+    return resource.FakultasResponse{
+        ID: f.ID,
+        Nama: f.Nama,
     }
 }
-
-func (t Test) ToResponseOnCreate() resource.TestResponseOnCreate {
-    return resource.TestResponseOnCreate{
-        ID: t.ID,
-    }
-}*/

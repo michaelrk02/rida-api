@@ -23,4 +23,6 @@ type RouteCollectionV1 interface {
     GetPeneliti(http.ResponseWriter, *http.Request)
     UpdatePeneliti(http.ResponseWriter, *http.Request)
     DeletePeneliti(http.ResponseWriter, *http.Request)
+
+    GetAllFakultas(http.ResponseWriter, *http.Request)
 }

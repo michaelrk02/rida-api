@@ -1,6 +1,8 @@
 package model
 
 import (
+    "errors"
+
     "github.com/google/uuid"
     "github.com/michaelrk02/rida-api/resource"
     "gorm.io/gorm"
@@ -22,6 +24,26 @@ type Peneliti struct {
 
 func (Peneliti) TableName() string {
     return "peneliti"
+}
+
+func (p Peneliti) Validate() error {
+    if p.Nidn == "" {
+        return errors.New("NIDN tidak boleh kosong")
+    }
+
+    if p.Nama == "" {
+        return errors.New("Nama tidak boleh kosong")
+    }
+
+    if p.ScopusAuthorID == "" {
+        return errors.New("Scopus author ID tidak boleh kosong")
+    }
+
+    if p.GscholarAuthorID == "" {
+        return errors.New("Google Scholar author ID tidak boleh kosong")
+    }
+
+    return nil
 }
 
 func (p *Peneliti) BeforeCreate(tx *gorm.DB) error {

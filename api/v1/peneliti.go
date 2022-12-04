@@ -32,7 +32,7 @@ func (routes *RouteCollection) CreatePeneliti(w http.ResponseWriter, r *http.Req
 
         err = tx.Where("nidn = ?", req.Nidn).First(&peneliti).Error
         if err == nil {
-            api.Error{Message: "Peneliti already exists"}.Send(w, 400, err)
+            api.Error{Message: "Peneliti sudah ada sebelumnya"}.Send(w, 400, err)
             return api.ErrorHandled
         }
         if err != nil {
@@ -47,6 +47,12 @@ func (routes *RouteCollection) CreatePeneliti(w http.ResponseWriter, r *http.Req
         peneliti = model.Peneliti{}
         peneliti.FromRequest(&req)
         peneliti.DiciptakanOlehID = admin.ID
+
+        err = peneliti.Validate()
+        if err != nil {
+            api.Error{Message: err.Error()}.Send(w, 400, err)
+            return api.ErrorHandled
+        }
 
         if !admin.FakultasID.Valid {
             if req.FakultasID == nil {
@@ -88,8 +94,16 @@ func (routes *RouteCollection) GetAllPeneliti(w http.ResponseWriter, r *http.Req
         "peneliti.nama",
     ).FromRequest(r, "")
 
+    owner := func(tx *gorm.DB) *gorm.DB {
+        admin := r.Context().Value("auth_entity").(model.Admin)
+        if admin.FakultasID.Valid {
+            return tx.Where("peneliti.fakultas_id = ?", admin.FakultasID)
+        }
+        return tx
+    }
+
     var totalItems int64
-    err = routes.App.DB.Model(&model.Peneliti{}).Joins("Fakultas").Joins("DiciptakanOleh").Scopes(ds.EnumerationScope).Count(&totalItems).Error
+    err = routes.App.DB.Model(&model.Peneliti{}).Joins("Fakultas").Joins("DiciptakanOleh").Scopes(ds.EnumerationScope).Scopes(owner).Count(&totalItems).Error
     if err != nil {
         api.Error{Message: api.ErrServerSide}.Send(w, 500, err)
         return
@@ -104,7 +118,7 @@ func (routes *RouteCollection) GetAllPeneliti(w http.ResponseWriter, r *http.Req
     }
 
     var penelitiList []model.Peneliti
-    err = routes.App.DB.Joins("Fakultas").Joins("DiciptakanOleh").Scopes(ds.PopulationScope).Find(&penelitiList).Error
+    err = routes.App.DB.Joins("Fakultas").Joins("DiciptakanOleh").Scopes(ds.PopulationScope).Scopes(owner).Find(&penelitiList).Error
     if err != nil {
         api.Error{Message: api.ErrServerSide}.Send(w, 500, err)
         return
@@ -178,6 +192,12 @@ func (routes *RouteCollection) UpdatePeneliti(w http.ResponseWriter, r *http.Req
         }
 
         peneliti.FromRequest(&req)
+
+        err = peneliti.Validate()
+        if err != nil {
+            api.Error{Message: err.Error()}.Send(w, 400, err)
+            return api.ErrorHandled
+        }
 
         err = routes.App.DB.Save(&peneliti).Error
         if err != nil {
