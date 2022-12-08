@@ -193,6 +193,16 @@ func (routes *RouteCollection) UpdatePeneliti(w http.ResponseWriter, r *http.Req
 
         peneliti.FromRequest(&req)
 
+        if !admin.FakultasID.Valid {
+            if req.FakultasID == nil {
+                api.Error{Message: api.ErrMalformedRequest}.Send(w, 400, errors.New("Fakultas must be present"))
+                return api.ErrorHandled
+            }
+            peneliti.FakultasID = *req.FakultasID
+        } else {
+            peneliti.FakultasID = admin.FakultasID.String
+        }
+
         err = peneliti.Validate()
         if err != nil {
             api.Error{Message: err.Error()}.Send(w, 400, err)
@@ -258,4 +268,132 @@ func (routes *RouteCollection) DeletePeneliti(w http.ResponseWriter, r *http.Req
     }
 
     w.WriteHeader(200)
+}
+
+func (routes *RouteCollection) GetPenelitiChart(w http.ResponseWriter, r *http.Request) {
+    var err error
+
+    fakultasScope := func (tx *gorm.DB) *gorm.DB {
+        if r.URL.Query().Get("fakultas_id") != "" {
+            return tx.Where("fakultas_id = ?", r.URL.Query().Get("fakultas_id"))
+        }
+        return tx
+    }
+
+    var resp resource.PenelitiChartResponseCollection
+    err = routes.App.DB.Model(&model.Peneliti{}).Select("h_index, COUNT(id) AS jumlah").Group("h_index").Scopes(fakultasScope).Find(&resp.Data).Error
+    if err != nil {
+        api.Error{Message: api.ErrServerSide}.Send(w, 500, err)
+        return
+    }
+
+    w.WriteHeader(200)
+    json.NewEncoder(w).Encode(&resp)
+}
+
+func (routes *RouteCollection) GetPenelitiTable(w http.ResponseWriter, r *http.Request) {
+    var err error
+
+    var hIndexList []int
+    err = routes.App.DB.Model(&model.Peneliti{}).Distinct("h_index").Order("h_index").Pluck("h_index", &hIndexList).Error
+    if err != nil {
+        api.Error{Message: api.ErrServerSide}.Send(w, 500, err)
+        return
+    }
+
+    hIndexMap := make(map[int]int)
+    for i, hIndex := range hIndexList {
+        hIndexMap[hIndex] = i
+    }
+
+    var fakultasList []struct{
+        ID string
+        Nama string
+        Total int
+    }
+    err = routes.App.DB.Model(&model.Fakultas{}).
+        Select("fakultas.id, fakultas.nama, COUNT(peneliti.id) AS total").
+        Joins("LEFT JOIN peneliti ON peneliti.fakultas_id = fakultas.id").
+        Group("fakultas.id, fakultas.nama").
+        Find(&fakultasList).Error
+    if err != nil {
+        api.Error{Message: api.ErrServerSide}.Send(w, 500, err)
+        return
+    }
+
+    fakultasMap := make(map[string]int)
+    penelitiCount := 0
+
+    for i, fakultas := range fakultasList {
+        fakultasMap[fakultas.ID] = i
+        penelitiCount += fakultas.Total
+    }
+
+    var resp resource.PenelitiTableResponse
+
+    resp.Headers = make([]string, len(fakultasList))
+    resp.Footers = make([]int, len(fakultasList))
+    for i, fakultas := range fakultasList {
+        resp.Headers[i] = fakultas.Nama
+        resp.Footers[i] = fakultas.Total
+    }
+
+    resp.Total = penelitiCount
+
+    resp.Rows = make([]resource.PenelitiTableRowResponse, len(hIndexList))
+    for i := range resp.Rows {
+        row := &resp.Rows[i]
+
+        row.HIndex = hIndexList[i]
+        row.Jumlah = 0
+
+        row.Columns = make([]resource.PenelitiTableColumnResponse, len(fakultasList))
+        for j := range row.Columns {
+            column := &row.Columns[j]
+
+            column.Jumlah = 0
+        }
+    }
+
+    var result []struct{
+        HIndex int
+        FakultasID string
+        Jumlah int
+    }
+    err = routes.App.DB.Model(&model.Peneliti{}).
+        Select("peneliti.h_index, peneliti.fakultas_id, COUNT(peneliti.id) AS jumlah").
+        Joins("JOIN fakultas ON fakultas.id = peneliti.fakultas_id").
+        Group("peneliti.h_index, peneliti.fakultas_id").
+        Find(&result).Error
+    if err != nil {
+        api.Error{Message: api.ErrServerSide}.Send(w, 500, err)
+        return
+    }
+
+    for _, data := range result {
+        row := hIndexMap[data.HIndex]
+        column := fakultasMap[data.FakultasID]
+
+        resp.Rows[row].Columns[column].Jumlah = data.Jumlah
+        resp.Rows[row].Jumlah += data.Jumlah
+    }
+
+    for i := range resp.Rows {
+        row := &resp.Rows[i]
+
+        row.Persentase = 0
+
+        for j := range row.Columns {
+            column := &row.Columns[j]
+
+            if row.Jumlah != 0 {
+                column.Persentase = float64(column.Jumlah) / float64(fakultasList[j].Total) * 100.0
+            }
+
+            row.Persentase += column.Persentase
+        }
+    }
+
+    w.WriteHeader(200)
+    json.NewEncoder(w).Encode(&resp)
 }

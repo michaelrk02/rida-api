@@ -17,6 +17,7 @@ type Peneliti struct {
     GscholarAuthorID string
     FakultasID string
     DiciptakanOlehID string
+    HIndex int
 
     Fakultas *Fakultas
     DiciptakanOleh *Admin
@@ -80,6 +81,7 @@ func (p Peneliti) ToResponse() resource.PenelitiResponse {
         DiciptakanOlehID: p.DiciptakanOlehID,
         FakultasNama: p.Fakultas.Nama,
         DiciptakanOlehNama: p.DiciptakanOleh.Nama,
+        HIndex: p.HIndex,
     }
 }
 

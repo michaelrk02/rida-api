@@ -16,6 +16,7 @@ type RouteCollectionV1 interface {
     GetAllAdmin(http.ResponseWriter, *http.Request)
     GetAdmin(http.ResponseWriter, *http.Request)
     UpdateAdmin(http.ResponseWriter, *http.Request)
+    UpdateAdminPassword(http.ResponseWriter, *http.Request)
     DeleteAdmin(http.ResponseWriter, *http.Request)
 
     CreatePeneliti(http.ResponseWriter, *http.Request)
@@ -23,6 +24,8 @@ type RouteCollectionV1 interface {
     GetPeneliti(http.ResponseWriter, *http.Request)
     UpdatePeneliti(http.ResponseWriter, *http.Request)
     DeletePeneliti(http.ResponseWriter, *http.Request)
+    GetPenelitiChart(http.ResponseWriter, *http.Request)
+    GetPenelitiTable(http.ResponseWriter, *http.Request)
 
     GetAllFakultas(http.ResponseWriter, *http.Request)
 }

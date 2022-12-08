@@ -30,6 +30,7 @@ CREATE TABLE `peneliti` (
     `gscholar_author_id` VARCHAR(128),
     `fakultas_id` CHAR(36),
     `diciptakan_oleh_id` CHAR(36),
+    `h_index` INT,
     PRIMARY KEY (`id`),
     CONSTRAINT `FK_Peneliti_Fakultas` FOREIGN KEY (`fakultas_id`) REFERENCES `fakultas` (`id`),
     CONSTRAINT `FK_Peneliti_DiciptakanOleh` FOREIGN KEY (`diciptakan_oleh_id`) REFERENCES `admin` (`id`)

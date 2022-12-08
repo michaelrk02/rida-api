@@ -21,6 +21,7 @@ type PenelitiResponse struct {
     FakultasNama string `json:"fakultas_nama"`
     DiciptakanOlehID string `json:"diciptakan_oleh_id"`
     DiciptakanOlehNama string `json:"diciptakan_oleh_nama"`
+    HIndex int `json:"h_index"`
 }
 
 type PenelitiResponseCollection struct {
@@ -33,4 +34,32 @@ type PenelitiResponseCollection struct {
 
 type PenelitiResponseOnCreate struct {
     ID string `json:"id"`
+}
+
+type PenelitiChartResponse struct {
+    HIndex int `json:"h_index"`
+    Jumlah int `json:"jumlah"`
+}
+
+type PenelitiChartResponseCollection struct {
+    Data []PenelitiChartResponse `json:"data"`
+}
+
+type PenelitiTableColumnResponse struct {
+    Jumlah int `json:"jumlah"`
+    Persentase float64 `json:"persentase"`
+}
+
+type PenelitiTableRowResponse struct {
+    HIndex int `json:"h_index"`
+    Columns []PenelitiTableColumnResponse `json:"columns"`
+    Jumlah int `json:"jumlah"`
+    Persentase float64 `json:"persentase"`
+}
+
+type PenelitiTableResponse struct {
+    Headers []string `json:"headers"`
+    Rows []PenelitiTableRowResponse `json:"rows"`
+    Footers []int `json:"footers"`
+    Total int `json:"total"`
 }

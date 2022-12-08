@@ -52,6 +52,9 @@ func (s *Seeder) RunV001000() {
             random, _ = rand.Int(rand.Reader, big.NewInt(int64(len(adminList))))
             peneliti.DiciptakanOlehID = adminList[int(random.Int64())].ID
 
+            random, _ = rand.Int(rand.Reader, big.NewInt(26))
+            peneliti.HIndex = int(random.Int64())
+
             s.DB.Create(&peneliti)
         }
     }

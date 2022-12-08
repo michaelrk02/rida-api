@@ -18,14 +18,17 @@ func InitRoutesV1(r chi.Router, app *service.Application) {
         r.Use(middleware.AuthAdmin(true))
         r.Post("/admin", app.RouteV1.CreateAdmin)
         r.Get("/admin", app.RouteV1.GetAllAdmin)
+        r.Put("/admin/{admin}", app.RouteV1.UpdateAdmin)
         r.Delete("/admin/{admin}", app.RouteV1.DeleteAdmin)
     })
     r.Group(func (r chi.Router) {
         r.Use(middleware.AuthAdmin(false))
         r.Get("/admin/{admin}", app.RouteV1.GetAdmin)
-        r.Put("/admin/{admin}", app.RouteV1.UpdateAdmin)
+        r.Put("/admin/{admin}/password", app.RouteV1.UpdateAdminPassword)
     })
 
+    r.Get("/peneliti/chart", app.RouteV1.GetPenelitiChart)
+    r.Get("/peneliti/table", app.RouteV1.GetPenelitiTable)
     r.Group(func (r chi.Router) {
         r.Use(middleware.AuthAdmin(false))
         r.Post("/peneliti", app.RouteV1.CreatePeneliti)

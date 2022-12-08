@@ -3,13 +3,18 @@ package resource
 type AdminRequest struct {
     Nama string `json:"nama"`
     Email string `json:"email"`
-    Password *string `json:"password"`
+    Password string `json:"password"`
     FakultasID string `json:"fakultas_id"`
 }
 
 type AdminRequestOnLogin struct {
     Email string `json:"email"`
     Password string `json:"password"`
+}
+
+type AdminRequestOnUpdatePassword struct {
+    OldPassword string `json:"old_password"`
+    NewPassword string `json:"new_password"`
 }
 
 type AdminResponse struct {
@@ -21,7 +26,10 @@ type AdminResponse struct {
 }
 
 type AdminResponseCollection struct {
-    Count int `json:"count"`
+    Population int `json:"population"`
+    Display int `json:"display"`
+    Page int `json:"page"`
+    MaxPage int `json:"max_page"`
     Data []AdminResponse `json:"data"`
 }
 
