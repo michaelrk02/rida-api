@@ -31,6 +31,7 @@ CREATE TABLE `peneliti` (
     `fakultas_id` CHAR(36),
     `diciptakan_oleh_id` CHAR(36),
     `h_index` INT,
+    `is_remote` BOOLEAN,
     PRIMARY KEY (`id`),
     CONSTRAINT `FK_Peneliti_Fakultas` FOREIGN KEY (`fakultas_id`) REFERENCES `fakultas` (`id`),
     CONSTRAINT `FK_Peneliti_DiciptakanOleh` FOREIGN KEY (`diciptakan_oleh_id`) REFERENCES `admin` (`id`)

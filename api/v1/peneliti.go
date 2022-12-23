@@ -89,8 +89,8 @@ func (routes *RouteCollection) GetAllPeneliti(w http.ResponseWriter, r *http.Req
 
     ds := service.NewDataSource(
         100,
-        []string{"peneliti.nidn", "peneliti.nama", "peneliti.scopus_author_id", "peneliti.gscholar_author_id", "Fakultas.nama", "DiciptakanOleh.nama"},
-        []string{"peneliti.nidn", "peneliti.nama", "Fakultas.nama", "DiciptakanOleh.nama"},
+        []string{"peneliti.nidn", "peneliti.nama", "peneliti.h_index", "peneliti.scopus_author_id", "peneliti.gscholar_author_id", "Fakultas.nama", "DiciptakanOleh.nama"},
+        []string{"peneliti.nidn", "peneliti.nama", "peneliti.h_index", "Fakultas.nama", "DiciptakanOleh.nama"},
         "peneliti.nama",
     ).FromRequest(r, "")
 
@@ -117,7 +117,7 @@ func (routes *RouteCollection) GetAllPeneliti(w http.ResponseWriter, r *http.Req
         return
     }
 
-    var penelitiList []model.Peneliti
+    penelitiList := []model.Peneliti{}
     err = routes.App.DB.Joins("Fakultas").Joins("DiciptakanOleh").Scopes(ds.PopulationScope).Scopes(owner).Find(&penelitiList).Error
     if err != nil {
         api.Error{Message: api.ErrServerSide}.Send(w, 500, err)

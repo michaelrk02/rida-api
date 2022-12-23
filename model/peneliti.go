@@ -18,6 +18,7 @@ type Peneliti struct {
     FakultasID string
     DiciptakanOlehID string
     HIndex int
+    IsRemote bool
 
     Fakultas *Fakultas
     DiciptakanOleh *Admin
@@ -65,6 +66,7 @@ func (p *Peneliti) FromRequest(req *resource.PenelitiRequest) *Peneliti {
     p.JenisKelamin = req.JenisKelamin
     p.ScopusAuthorID = req.ScopusAuthorID
     p.GscholarAuthorID = req.GscholarAuthorID
+    p.IsRemote = true
 
     return p
 }
@@ -82,6 +84,7 @@ func (p Peneliti) ToResponse() resource.PenelitiResponse {
         FakultasNama: p.Fakultas.Nama,
         DiciptakanOlehNama: p.DiciptakanOleh.Nama,
         HIndex: p.HIndex,
+        IsRemote: p.IsRemote,
     }
 }
 

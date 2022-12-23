@@ -22,6 +22,7 @@ type PenelitiResponse struct {
     DiciptakanOlehID string `json:"diciptakan_oleh_id"`
     DiciptakanOlehNama string `json:"diciptakan_oleh_nama"`
     HIndex int `json:"h_index"`
+    IsRemote bool `json:"is_remote"`
 }
 
 type PenelitiResponseCollection struct {

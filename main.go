@@ -30,6 +30,7 @@ func main() {
 
     flag.BoolVar(&app.Params.Help, "help", false, "show help")
     flag.BoolVar(&app.Params.Seed, "seed", false, "perform database seeding")
+    flag.BoolVar(&app.Params.Sync, "sync", false, "perform h-index synchronization")
     flag.BoolVar(&app.Params.Daemon, "daemon", false, "run HTTP daemon process")
     flag.BoolVar(&app.Params.Panic, "panic", false, "panics when a server error occurs")
     flag.Parse()
@@ -71,6 +72,14 @@ func main() {
         s.RunV001000()
 
         fmt.Println("Database seeding completed")
+    }
+
+    if app.Params.Sync {
+        fmt.Println("Synchronizing H-Index values ...")
+
+        app.SyncHIndex()
+
+        fmt.Println("H-Index synchronization completed")
     }
 
     if app.Params.Daemon {
