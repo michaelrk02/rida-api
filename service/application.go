@@ -13,7 +13,8 @@ import (
 
 type CmdParams struct {
     Help bool
-    Seed bool
+    SeedLocal bool
+    SeedRemote bool
     Sync bool
     Daemon bool
     Panic bool

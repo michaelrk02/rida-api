@@ -29,7 +29,8 @@ func main() {
     app := service.InitApplication()
 
     flag.BoolVar(&app.Params.Help, "help", false, "show help")
-    flag.BoolVar(&app.Params.Seed, "seed", false, "perform database seeding")
+    flag.BoolVar(&app.Params.SeedLocal, "seed-local", false, "perform database seeding (local data)")
+    flag.BoolVar(&app.Params.SeedRemote, "seed-remote", false, "perform database seeding (remote data)")
     flag.BoolVar(&app.Params.Sync, "sync", false, "perform h-index synchronization")
     flag.BoolVar(&app.Params.Daemon, "daemon", false, "run HTTP daemon process")
     flag.BoolVar(&app.Params.Panic, "panic", false, "panics when a server error occurs")
@@ -66,10 +67,10 @@ func main() {
         App: app,
     }
 
-    if app.Params.Seed {
+    if app.Params.SeedLocal || app.Params.SeedRemote {
         s := seeder.Seeder{DB: app.DB}
 
-        s.RunV001000()
+        s.RunV001000(app.Params.SeedLocal, app.Params.SeedRemote)
 
         fmt.Println("Database seeding completed")
     }

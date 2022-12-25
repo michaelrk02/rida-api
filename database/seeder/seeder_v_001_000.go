@@ -11,7 +11,7 @@ import (
     "github.com/michaelrk02/rida-api/model"
 )
 
-func (s *Seeder) RunV001000() {
+func (s *Seeder) RunV001000(localData, remoteData bool) {
     var random *big.Int
 
     s.DB.Exec("DELETE FROM `peneliti`")
@@ -32,30 +32,43 @@ func (s *Seeder) RunV001000() {
 
     s.DB.Create(&adminList)
 
-    for i := range fakultasList {
-        random, _ = rand.Int(rand.Reader, big.NewInt(40))
-        penelitiCount := int(random.Int64()) + 10
-        for j := 0; j < penelitiCount; j++ {
-            peneliti := model.Peneliti{
-                Nama: faker.Name(),
-                ScopusAuthorID: uuid.New().String(),
-                GscholarAuthorID: uuid.New().String(),
-                FakultasID: fakultasList[i].ID,
+    if localData {
+        for i := range fakultasList {
+            random, _ = rand.Int(rand.Reader, big.NewInt(40))
+            penelitiCount := int(random.Int64()) + 10
+            for j := 0; j < penelitiCount; j++ {
+                peneliti := model.Peneliti{
+                    Nama: faker.Name(),
+                    ScopusAuthorID: uuid.New().String(),
+                    GscholarAuthorID: uuid.New().String(),
+                    FakultasID: fakultasList[i].ID,
+                }
+
+                random, _ = rand.Int(rand.Reader, big.NewInt(9000000))
+                peneliti.Nidn = strconv.Itoa(1000000 + int(random.Int64()))
+
+                random, _ = rand.Int(rand.Reader, big.NewInt(2))
+                peneliti.JenisKelamin = []string{"Laki-Laki", "Perempuan"}[random.Int64()]
+
+                random, _ = rand.Int(rand.Reader, big.NewInt(int64(len(adminList))))
+                peneliti.DiciptakanOlehID = adminList[int(random.Int64())].ID
+
+                random, _ = rand.Int(rand.Reader, big.NewInt(26))
+                peneliti.HIndex = int(random.Int64())
+
+                s.DB.Create(&peneliti)
             }
-
-            random, _ = rand.Int(rand.Reader, big.NewInt(9000000))
-            peneliti.Nidn = strconv.Itoa(1000000 + int(random.Int64()))
-
-            random, _ = rand.Int(rand.Reader, big.NewInt(2))
-            peneliti.JenisKelamin = []string{"Laki-Laki", "Perempuan"}[random.Int64()]
-
-            random, _ = rand.Int(rand.Reader, big.NewInt(int64(len(adminList))))
-            peneliti.DiciptakanOlehID = adminList[int(random.Int64())].ID
-
-            random, _ = rand.Int(rand.Reader, big.NewInt(26))
-            peneliti.HIndex = int(random.Int64())
-
-            s.DB.Create(&peneliti)
         }
+    }
+
+    if remoteData {
+        penelitiList := []model.Peneliti{
+            {Nidn: "0027038005", Nama: "Haryono Setiadi", JenisKelamin: "Laki-Laki", ScopusAuthorID: "-", GscholarAuthorID: "y-2QKVYAAAAJ", FakultasID: "b62d129e-3517-4c87-806c-6b77fb3512ff", DiciptakanOlehID: adminList[0].ID, IsRemote: true},
+            {Nidn: "0002038307", Nama: "Heri Prasetyo", JenisKelamin: "Laki-Laki", ScopusAuthorID: "-", GscholarAuthorID: "vAk-cQ0AAAAJ", FakultasID: "b62d129e-3517-4c87-806c-6b77fb3512ff", DiciptakanOlehID: adminList[0].ID, IsRemote: true},
+            {Nidn: "0002038307", Nama: "Dewi Wisnu Wardani", JenisKelamin: "Perempuan", ScopusAuthorID: "-", GscholarAuthorID: "jqTz_58AAAAJ", FakultasID: "b62d129e-3517-4c87-806c-6b77fb3512ff", DiciptakanOlehID: adminList[0].ID, IsRemote: true},
+            {Nidn: "0002038307", Nama: "Wiharto", JenisKelamin: "Laki-Laki", ScopusAuthorID: "-", GscholarAuthorID: "ctkQIV0AAAAJ", FakultasID: "b62d129e-3517-4c87-806c-6b77fb3512ff", DiciptakanOlehID: adminList[0].ID, IsRemote: true},
+        }
+
+        s.DB.Create(&penelitiList)
     }
 }

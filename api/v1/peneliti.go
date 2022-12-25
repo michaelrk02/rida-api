@@ -386,7 +386,7 @@ func (routes *RouteCollection) GetPenelitiTable(w http.ResponseWriter, r *http.R
         for j := range row.Columns {
             column := &row.Columns[j]
 
-            if row.Jumlah != 0 {
+            if fakultasList[j].Total != 0 {
                 column.Persentase = float64(column.Jumlah) / float64(fakultasList[j].Total) * 100.0
             }
 
